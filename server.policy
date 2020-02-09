@@ -1,0 +1,3 @@
+grant codeBase "file:/home/luke/distributedSytems/assignment1/ct414" {
+    permission java.security.AllPermission;
+};
