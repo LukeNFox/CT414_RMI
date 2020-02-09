@@ -22,6 +22,7 @@ public class ExamEngine implements ExamServer {
     public int login(int studentid, String password) throws
             UnauthorizedAccess, RemoteException {
 
+        System.out.println("Trying to login");
 	// TBD: You need to implement this method!
 	// For the moment method just returns an empty or null value to allow it to compile
 
@@ -60,15 +61,15 @@ public class ExamEngine implements ExamServer {
             System.setSecurityManager(new SecurityManager());
         }
         try {
-            String name = "assess.ExamServer";
+            String name = "ExamServer";
             ExamServer engine = new ExamEngine();
             ExamServer stub =
                 (ExamServer) UnicastRemoteObject.exportObject(engine, 0);
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.createRegistry(20345);
             registry.rebind(name, stub);
-            System.out.println("engine.ExamEngine bound");
+            System.out.println("ExamEngine bound");
         } catch (Exception e) {
-            System.err.println("engine.ExamEngine exception:");
+            System.err.println("ExamEngine exception:");
             e.printStackTrace();
         }
     }

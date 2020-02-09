@@ -9,14 +9,6 @@ import java.util.List;
 
 public class AssessmentClass implements Assessment {
 
-    private List<Question> questions;
-
-
-    public AssessmentClass() {
-
-
-    }
-
     @Override
     public String getInformation() {
         return null;
