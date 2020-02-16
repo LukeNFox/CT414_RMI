@@ -16,6 +16,7 @@ public class ExamEngine implements ExamServer {
     private ArrayList<Student> students = new ArrayList<>();
     private ArrayList<Session> sessions = new ArrayList<>();
     private ArrayList<Assessment> assessments = new ArrayList<>();
+    private ArrayList<Assessment> availableForCorrection = new ArrayList<>();
 
     // Constructor is required
     public ExamEngine() {
@@ -128,6 +129,23 @@ public class ExamEngine implements ExamServer {
         // check token is valid
         // check submission date has not passed
         // add assessment to list of assessments ready for correction
+
+
+        Boolean valid = false;
+
+        for(Session session: sessions){
+            if(session.getStudentid() == studentid && session.getToken() == token){
+                System.out.println("Session is valid");
+                valid = true;
+            }
+        }
+
+        if(valid == false){
+            throw new UnauthorizedAccess("No session matches your credentials");
+        }else{
+            availableForCorrection.add(completed);
+            System.out.println("Assessment has been submitted for correction");
+        }
 
     }
 

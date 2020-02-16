@@ -11,6 +11,18 @@ import java.rmi.registry.Registry;
 
 public class Client {
     private Client() {}
+
+    public static void getCommands(){
+        System.out.println("\n You are Logged in");
+        System.out.println("\n ---- Available commands ---- ");
+        System.out.println("To get all available Assessments =  all ");
+        System.out.println("To download an Assessment =  get ");
+        System.out.println("To submit an Assessment =  submit ");
+        System.out.println("To print out commands =  help ");
+        System.out.println("To end the session =  end ");
+        System.out.println("----------------------- ");
+    }
+
     public static void main(String[] args) {
         int var1 = 20345;
         int authToken = 0;
@@ -52,15 +64,10 @@ public class Client {
             }
 
             if(authToken != 0){
-                System.out.println("\n You are Logged in");
-                System.out.println("\n ---- Available commands ---- ");
-                System.out.println("To get all available Assessments =  all ");
-                System.out.println("To download an Assessment =  get ");
-                System.out.println("To end the session =  end ");
-                System.out.println("----------------------- ");
+                getCommands();
             }
 
-            Assessment assessment;
+            Assessment assessment = null;
 
             while(authToken != 0){
                 System.out.print("\n Please input a command: ");
@@ -77,7 +84,7 @@ public class Client {
                     System.out.print("\n Downloading Assessment..... ");
                     try {
                         assessment = stub.getAssessment(authToken, studentId, courseCode);
-                        System.out.print("\n Assessment Downloaded! ");
+                        System.out.print("\n Assessment Downloaded! \n");
                     }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
 
 
@@ -86,7 +93,28 @@ public class Client {
 
 
 
-                }else if(command.equals("end")) {
+                }else if(command.equals("submit")) {
+                    System.out.print("\n Are you sure you want to submit your assessment(Y/N)? ");
+                    String response = scanner.next();
+
+                    if(response.equals("Y")){
+                        if(assessment != null) {
+                            stub.submitAssessment(authToken, studentId, assessment);
+                            System.out.print("\n Assessment Submitted! \n");
+                        }else{
+                            System.out.print("\n You have not completed an assessment yet\n ");
+                        }
+
+                    }else if(response.equals("N")){
+
+                    }else{
+                        System.out.print("\n Invalid command \n ");
+                    }
+
+
+                }else if(command.equals("help")) {
+                    getCommands();
+                } else if(command.equals("end")) {
                     System.out.println("\n Goodbye");
                     break;
                 }else{
