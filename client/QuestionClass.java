@@ -4,20 +4,28 @@ import assess.Question;
 
 public class QuestionClass implements Question {
 
-    public QuestionClass(){}
+	private int qNumber;
+	private String qDetail;
+	private String[] options;
+	
+    public QuestionClass(int qNumber, String qDetail, String[] options){
+    	this.qNumber = qNumber;
+    	this.qDetail = qDetail;
+    	this.options = options;
+    }
 
     @Override
     public int getQuestionNumber() {
-        return 0;
+        return this.qNumber;
     }
 
     @Override
     public String getQuestionDetail() {
-        return null;
+        return this.qDetail;
     }
 
     @Override
     public String[] getAnswerOptions() {
-        return new String[0];
+        return this.options;
     }
 }
