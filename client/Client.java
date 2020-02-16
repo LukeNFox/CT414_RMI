@@ -1,5 +1,7 @@
 package client;
+import assess.Assessment;
 import assess.ExamServer;
+import errors.NoMatchingAssessment;
 import errors.UnauthorizedAccess;
 
 import java.util.Scanner;
@@ -53,9 +55,12 @@ public class Client {
                 System.out.println("\n You are Logged in");
                 System.out.println("\n ---- Available commands ---- ");
                 System.out.println("To get all available Assessments =  all ");
+                System.out.println("To download an Assessment =  get ");
                 System.out.println("To end the session =  end ");
                 System.out.println("----------------------- ");
             }
+
+            Assessment assessment;
 
             while(authToken != 0){
                 System.out.print("\n Please input a command: ");
@@ -63,6 +68,24 @@ public class Client {
 
                 if(command.equals("all")){
                     System.out.println("\n" + stub.getAvailableSummary(authToken,studentId) + "\n");
+                }else if(command.equals("get")) {
+
+
+
+                    System.out.print("\n Please enter Course Code: ");
+                    String courseCode = scanner.next();
+                    System.out.print("\n Downloading Assessment..... ");
+                    try {
+                        assessment = stub.getAssessment(authToken, studentId, courseCode);
+                        System.out.print("\n Assessment Downloaded! ");
+                    }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
+
+
+                    // need to interact with assessment object
+                    // for example complete questions
+
+
+
                 }else if(command.equals("end")) {
                     System.out.println("\n Goodbye");
                     break;

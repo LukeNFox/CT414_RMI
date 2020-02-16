@@ -97,10 +97,27 @@ public class ExamEngine implements ExamServer {
         // check token is valid
         // return assessment object
         // ensure assessment available to student
-        // set student id in assessment object
 
+        Boolean valid = false;
 
-        return null;
+        for(Session session: sessions){
+            if(session.getStudentid() == studentid && session.getToken() == token){
+                System.out.println("Session is valid");
+                valid = true;
+            }
+        }
+
+        if(valid == false){
+            throw new UnauthorizedAccess("No session matches your credentials");
+        }else{
+
+            for(Assessment assessment: assessments){
+                AssessmentClass assessment1 = (AssessmentClass) assessment;
+                if(assessment1.getAssociatedID() == studentid && assessment1.getCourseCode().equals(courseCode))
+                    return assessment;
+            }
+            throw new NoMatchingAssessment("Could not find matching assessment");
+        }
     }
 
     // Submit a completed assessment
@@ -146,6 +163,7 @@ public class ExamEngine implements ExamServer {
             ExamServer stub =
                 (ExamServer) UnicastRemoteObject.exportObject(engine, 0);
             Registry registry = LocateRegistry.createRegistry(20345);
+            //Registry registry = LocateRegistry.getRegistry(20345);
             registry.rebind(name, stub);
             System.out.println("ExamEngine bound");
         } catch (Exception e) {

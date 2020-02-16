@@ -14,13 +14,15 @@ public class AssessmentClass implements Assessment {
     private ArrayList<Question> questions = new ArrayList<>();
     private LocalDate closingDate;
     private String information;
+    private String courseCode;
     private int studentid;
 
     public AssessmentClass(LocalDate closingDate, String title, int studentid, ArrayList<Question> questions){
         this.closingDate = closingDate;
         this.studentid = studentid;
         this.questions = questions;
-        this.information = ("\n Exam: " + title + "\n Closing Date: " + closingDate.toString() + "\n Number of Questions: " + questions.size());
+        this.courseCode = title;
+        this.information = ("\n Course code: " + title + "\n Closing Date: " + closingDate.toString() + "\n Number of Questions: " + questions.size());
     }
 
     @Override
@@ -62,5 +64,14 @@ public class AssessmentClass implements Assessment {
     public int getAssociatedID() {
         return studentid;
     }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
 
 }
