@@ -34,57 +34,66 @@ public class ExamEngine implements ExamServer {
         //else throws unauthorised exception
 
         String realPass = null;
+        Boolean existingSession = false;
+        Session thisSession = null;
         int token = 0;
 
         System.out.println("Trying to login");
-
-        for(Student student: students){
-            if(student.getStudentid() == studentid) {
+        System.out.println("Checking Password");
+        for (Student student : students) {
+            if (student.getStudentid() == studentid) {
                 realPass = student.getPassword();
             }
         }
-        System.out.println("Real Password: " + realPass);
+        if (realPass.equals(password)) {
 
-        if(realPass.equals(password)){
-            Session session = new SessionClass(studentid);
-            sessions.add(session);
-            token = session.getToken();
-        }else{
-            throw new UnauthorizedAccess("Unable to login");
+            for(Session session: sessions){
+                if(session.getStudentid() == studentid){
+                    existingSession = true;
+                    thisSession = session;
+                }
+            }
+
+            if(existingSession){
+                System.out.println("Session already Exists");
+                token = thisSession.getToken();
+            }else{
+                System.out.println("Creating Session");
+                thisSession = new SessionClass(studentid);
+                sessions.add(thisSession);
+                token = thisSession.getToken();
+            }
+
+        } else {
+            System.out.println("Incorrect Password");
+            throw new UnauthorizedAccess("Unable to login - Incorrect Password");
         }
-
-	return token;
+        return token;
     }
 
     // Return a summary list of Assessments currently available for this studentid
     public List<String> getAvailableSummary(int token, int studentid) throws
             UnauthorizedAccess, NoMatchingAssessment, RemoteException {
 
-        // TBD: You need to implement this method!
-        // For the moment method just returns an empty or null value to allow it to compile
-
         // check token is valid
         // return list of assessment information available for that student
 
-        Boolean valid = false;
+        Boolean valid = checkSession(studentid, token);
+        List<String> summaries = new ArrayList<>();
 
-        for(Session session: sessions){
-            if(session.getStudentid() == studentid && session.getToken() == token){
-                System.out.println("Session is valid");
-                valid = true;
+        System.out.println("Gathering assessment details");
+        if (valid) {
+            for (Assessment assessment : assessments) {
+                if (assessment.getAssociatedID() == studentid)
+                    summaries.add(assessment.getInformation());
             }
         }
 
-        if(valid == false){
-            throw new UnauthorizedAccess("No session matches your credentials");
-        }else{
-            List<String> summaries = new ArrayList<>();
-
-            for(Assessment assessment: assessments){
-                if(assessment.getAssociatedID() == studentid)
-                    summaries.add(assessment.getInformation());
-            }
+        if(summaries.size() > 0){
             return summaries;
+        }else{
+            System.out.println("No assessments match this id");
+            throw new NoMatchingAssessment("Could not find any assessments matching your id");
         }
     }
 
@@ -92,34 +101,27 @@ public class ExamEngine implements ExamServer {
     public Assessment getAssessment(int token, int studentid, String courseCode) throws
             UnauthorizedAccess, NoMatchingAssessment, RemoteException {
 
-        // TBD: You need to implement this method!
-        // For the moment method just returns an empty or null value to allow it to compile
-
         // check token is valid
         // return assessment object
         // ensure assessment available to student
 
-        Boolean valid = false;
+        Boolean valid = checkSession(studentid, token);
 
-        for(Session session: sessions){
-            if(session.getStudentid() == studentid && session.getToken() == token){
-                System.out.println("Session is valid");
-                valid = true;
-            }
-        }
-
-        if(valid == false){
-            throw new UnauthorizedAccess("No session matches your credentials");
-        }else{
-
-            for(Assessment assessment: assessments){
+        System.out.println("Finding assessment matching course code");
+        if(valid) {
+            for (Assessment assessment : assessments) {
                 AssessmentClass assessment1 = (AssessmentClass) assessment;
-                if(assessment1.getAssociatedID() == studentid && assessment1.getCourseCode().equals(courseCode))
+                if (assessment1.getAssociatedID() == studentid && assessment1.getCourseCode().equals(courseCode))
                     return assessment;
             }
+            System.out.println("No assessments match course code");
             throw new NoMatchingAssessment("Could not find matching assessment");
+        }else{
+            System.out.println("Session details are invalid");
+            throw new UnauthorizedAccess("No session matches your credentials");
         }
     }
+
 
     // Submit a completed assessment
     public void submitAssessment(int token, int studentid, Assessment completed) throws
@@ -131,20 +133,14 @@ public class ExamEngine implements ExamServer {
         // add assessment to list of assessments ready for correction
 
 
-        Boolean valid = false;
+        Boolean valid = checkSession(studentid,token);
 
-        for(Session session: sessions){
-            if(session.getStudentid() == studentid && session.getToken() == token){
-                System.out.println("Session is valid");
-                valid = true;
-            }
-        }
-
-        if(valid == false){
-            throw new UnauthorizedAccess("No session matches your credentials");
-        }else{
+        if(valid){
             availableForCorrection.add(completed);
             System.out.println("Assessment has been submitted for correction");
+        }else{
+            System.out.println("Session details are invalid");
+            throw new UnauthorizedAccess("No session matches your credentials");
         }
 
     }
@@ -162,13 +158,21 @@ public class ExamEngine implements ExamServer {
         Question question2 = new QuestionClass();
         questions.add(question2);
 
-
         LocalDate closingDate = LocalDate.parse("2020-02-17");
         String title = "CT414";
         for(Student student: students) {
             assessments.add(new AssessmentClass(closingDate, title, student.getStudentid(), questions));
         }
+    }
 
+    public boolean checkSession(int studentid, int token) throws UnauthorizedAccess{
+        for(Session session: sessions){
+            if(session.getStudentid() == studentid && session.getToken() == token){
+                System.out.println("Session details are valid for this request");
+                return true;
+            }
+        }
+        throw new UnauthorizedAccess("No session matches your credentials");
     }
 
     public static void main(String[] args) {

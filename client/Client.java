@@ -74,33 +74,42 @@ public class Client {
                 String command = scanner.next();
 
                 if(command.equals("all")){
+
                     System.out.println("\n" + stub.getAvailableSummary(authToken,studentId) + "\n");
+
                 }else if(command.equals("get")) {
-
-
 
                     System.out.print("\n Please enter Course Code: ");
                     String courseCode = scanner.next();
                     System.out.print("\n Downloading Assessment..... ");
                     try {
+
                         assessment = stub.getAssessment(authToken, studentId, courseCode);
                         System.out.print("\n Assessment Downloaded! \n");
+
                     }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
 
 
                     // need to interact with assessment object
-                    // for example complete questions
+                    // implement remaining methods
+                    // view question and options
+                    // answer a question
+                    // change a question
 
 
 
                 }else if(command.equals("submit")) {
+
                     System.out.print("\n Are you sure you want to submit your assessment(Y/N)? ");
                     String response = scanner.next();
 
                     if(response.equals("Y")){
+
                         if(assessment != null) {
+
                             stub.submitAssessment(authToken, studentId, assessment);
                             System.out.print("\n Assessment Submitted! \n");
+
                         }else{
                             System.out.print("\n You have not completed an assessment yet\n ");
                         }
@@ -113,16 +122,19 @@ public class Client {
 
 
                 }else if(command.equals("help")) {
+
                     getCommands();
+
                 } else if(command.equals("end")) {
+
                     System.out.println("\n Goodbye");
                     break;
+
                 }else{
                     System.out.println("\n Invalid Command!");
                 }
             }
 
-            // System.out.println("Remote method invoked");
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
