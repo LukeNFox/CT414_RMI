@@ -5,6 +5,7 @@ import errors.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface ExamServer extends Remote {

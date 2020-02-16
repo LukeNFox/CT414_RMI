@@ -2,10 +2,9 @@ package assess;
 
 import errors.*;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public interface Student extends Serializable {
+public interface Student{
 
     public String getPassword();
 

@@ -2,19 +2,26 @@ package engine;
 
 import assess.Assessment;
 import assess.ExamServer;
+import assess.Session;
+import assess.Student;
 import errors.*;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExamEngine implements ExamServer {
 
+    private ArrayList<Student> students = new ArrayList<>();
+    private ArrayList<Session> sessions = new ArrayList<>();
+
     // Constructor is required
     public ExamEngine() {
         super();
+        initialiseServer();
     }
 
     // Implement the methods defined in the assess.ExamServer interface...
@@ -22,11 +29,31 @@ public class ExamEngine implements ExamServer {
     public int login(int studentid, String password) throws
             UnauthorizedAccess, RemoteException {
 
-        System.out.println("Trying to login");
-	// TBD: You need to implement this method!
-	// For the moment method just returns an empty or null value to allow it to compile
+        //check student id and password match a student
+        // if so this will return an Auth token
+        //else throws unauthorised exception
 
-	return 0;	
+        String realPass = null;
+        int token = 0;
+
+        System.out.println("Trying to login");
+
+        for(Student student: students){
+            if(student.getStudentid() == studentid) {
+                realPass = student.getPassword();
+            }
+        }
+        System.out.println("Real Password: " + realPass);
+
+        if(realPass.equals(password)){
+            Session session = new SessionClass(studentid);
+            sessions.add(session);
+            token = session.getToken();
+        }else{
+            throw new UnauthorizedAccess("Unable to login");
+        }
+
+	return token;
     }
 
     // Return a summary list of Assessments currently available for this studentid
@@ -35,6 +62,9 @@ public class ExamEngine implements ExamServer {
 
         // TBD: You need to implement this method!
         // For the moment method just returns an empty or null value to allow it to compile
+
+        // check token is valid
+        // return list of assessment information available for that student
 
         return null;
     }
@@ -46,6 +76,12 @@ public class ExamEngine implements ExamServer {
         // TBD: You need to implement this method!
         // For the moment method just returns an empty or null value to allow it to compile
 
+        // check token is valid
+        // return assessment object
+        // ensure assessment available to student
+        // set student id in assessment object
+
+
         return null;
     }
 
@@ -54,6 +90,19 @@ public class ExamEngine implements ExamServer {
             UnauthorizedAccess, NoMatchingAssessment, RemoteException {
 
         // TBD: You need to implement this method!
+        // check token is valid
+        // check submission date has not passed
+        // add assessment to list of assessments ready for correction
+
+    }
+
+    public void initialiseServer(){
+
+        Student luke = new StudentClass(1, "mypass");
+        students.add(luke);
+        Student declan = new StudentClass(2, "decspass");
+        students.add(declan);
+
     }
 
     public static void main(String[] args) {
