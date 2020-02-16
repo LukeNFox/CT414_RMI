@@ -1,5 +1,6 @@
 package assess;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import errors.*;
@@ -11,7 +12,7 @@ public interface Assessment extends Serializable {
 	public String getInformation();
 
 	// Return the final date / time for submission of completed assessment
-	public Date getClosingDate();
+	public LocalDate getClosingDate();
 
 	// Return a list of all questions and answer options
 	public List<Question> getQuestions();

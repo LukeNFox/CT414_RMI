@@ -1,22 +1,21 @@
 package engine;
 
-import assess.Assessment;
-import assess.ExamServer;
-import assess.Session;
-import assess.Student;
+import assess.*;
+import client.QuestionClass;
 import errors.*;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 public class ExamEngine implements ExamServer {
 
     private ArrayList<Student> students = new ArrayList<>();
     private ArrayList<Session> sessions = new ArrayList<>();
+    private ArrayList<Assessment> assessments = new ArrayList<>();
 
     // Constructor is required
     public ExamEngine() {
@@ -66,7 +65,26 @@ public class ExamEngine implements ExamServer {
         // check token is valid
         // return list of assessment information available for that student
 
-        return null;
+        Boolean valid = false;
+
+        for(Session session: sessions){
+            if(session.getStudentid() == studentid && session.getToken() == token){
+                System.out.println("Session is valid");
+                valid = true;
+            }
+        }
+
+        if(valid == false){
+            throw new UnauthorizedAccess("No session matches your credentials");
+        }else{
+            List<String> summaries = new ArrayList<>();
+
+            for(Assessment assessment: assessments){
+                if(assessment.getAssociatedID() == studentid)
+                    summaries.add(assessment.getInformation());
+            }
+            return summaries;
+        }
     }
 
     // Return an assess.Assessment object associated with a particular course code
@@ -102,6 +120,19 @@ public class ExamEngine implements ExamServer {
         students.add(luke);
         Student declan = new StudentClass(2, "decspass");
         students.add(declan);
+
+        ArrayList<Question > questions = new ArrayList<>();
+        Question question1 = new QuestionClass();
+        questions.add(question1);
+        Question question2 = new QuestionClass();
+        questions.add(question2);
+
+
+        LocalDate closingDate = LocalDate.parse("2020-02-17");
+        String title = "CT414";
+        for(Student student: students) {
+            assessments.add(new AssessmentClass(closingDate, title, student.getStudentid(), questions));
+        }
 
     }
 

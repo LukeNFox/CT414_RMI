@@ -49,10 +49,26 @@ public class Client {
                 authToken = 0;
             }
 
-            while(authToken != 0){
+            if(authToken != 0){
                 System.out.println("\n You are Logged in");
-                System.out.println("\n Lets do an exam");
-                break;
+                System.out.println("\n ---- Available commands ---- ");
+                System.out.println("To get all available Assessments =  all ");
+                System.out.println("To end the session =  end ");
+                System.out.println("----------------------- ");
+            }
+
+            while(authToken != 0){
+                System.out.print("\n Please input a command: ");
+                String command = scanner.next();
+
+                if(command.equals("all")){
+                    System.out.println("\n" + stub.getAvailableSummary(authToken,studentId) + "\n");
+                }else if(command.equals("end")) {
+                    System.out.println("\n Goodbye");
+                    break;
+                }else{
+                    System.out.println("\n Invalid Command!");
+                }
             }
 
             // System.out.println("Remote method invoked");
