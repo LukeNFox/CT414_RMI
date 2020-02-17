@@ -1,13 +1,16 @@
 package client;
 import assess.Assessment;
 import assess.ExamServer;
+import assess.Question;
 import errors.NoMatchingAssessment;
 import errors.UnauthorizedAccess;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.time.LocalDate;
 
 public class Client {
     private Client() {}
@@ -68,6 +71,7 @@ public class Client {
             }
 
             Assessment assessment = null;
+            Question question= null;
 
             while(authToken != 0){
                 System.out.print("\n Please input a command: ");
@@ -85,13 +89,29 @@ public class Client {
                     try {
                         assessment = stub.getAssessment(authToken, studentId, courseCode);
                         System.out.print("\n Assessment Downloaded! \n");
+                        
+                        if(courseCode.equals("CT414")){
+                            
+                        	System.out.print("\n" + assessment.getInformation());
+                        	
+                        	for (int i=0; i==question.getQuestionNumber(); i++) {
+                        		
+                        		System.out.print("\n Question " + i + ": " + assessment.getQuestion(i));
+                        		System.out.print("\n Your Options are: " + question.getAnswerOptions());
+                        		System.out.print("\n Is the answer 0, 1 or 2? ");
+                        		
+                        		int response = scanner.nextInt();
+                        		assessment.selectAnswer(question.getQuestionNumber(), response);
+                        		
+                        } 
+                       }
+                        
                     }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
 
 
                     // need to interact with assessment object
                     // for example complete questions
-
-
+                    
 
                 }else if(command.equals("submit")) {
                     System.out.print("\n Are you sure you want to submit your assessment(Y/N)? ");
