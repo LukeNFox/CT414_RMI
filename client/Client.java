@@ -80,7 +80,7 @@ public class Client {
                     try {
                         System.out.println("\n" + stub.getAvailableSummary(authToken,studentId) + "\n");
                     }catch (UnauthorizedAccess e){
-                        System.out.print("\n Unable to get Assessments, please Logout!");
+                        System.out.print("\n Unable to get Assessments!");
                         System.out.print("\n Error: " + e.getMessage());
                     }
 
@@ -96,7 +96,7 @@ public class Client {
 
                         }catch(NoMatchingAssessment e){System.out.print("\n" + e);
                         }catch (UnauthorizedAccess e){
-                        System.out.print("\n Unable to get Assessment, please Logout!");
+                        System.out.print("\n Unable to get Assessment!");
                         System.out.print("\n Error: " + e.getMessage());
                     }
 
@@ -185,7 +185,7 @@ public class Client {
                                 stub.submitAssessment(authToken, studentId, assessment);
                                 System.out.print("\n Assessment Submitted! \n");
                             }catch (UnauthorizedAccess e){
-                                System.out.print("\n Unable to submit Assessment, please Logout!");
+                                System.out.print("\n Unable to submit Assessment!");
                                 System.out.print("\n Error: " + e.getMessage());
                             }
                         }else{
