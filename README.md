@@ -1,11 +1,21 @@
-###### `To Run Project`
+#Java RMI Exam Center
 
-1. Change file location in client.policy and server.policy to match your own file structure
+####To Run Project:
+- Change file location in client.policy and server.policy to match your own file structure
 
-2. Run *javac ./\*/\*.java* from root directory
+- Run **_javac ./\*/\*.java_** from root directory
 
-3. Run *java -Djava.security.policy=server.policy engine.ExamEngine*
+- Run **_rmiregistry 20345_**
 
-4. Run in seperate terminal *java -Djava.security.policy=client.policy client.Client*
+- Run in new terminal **_java -Djava.security.policy=server.policy engine.ExamEngine_**
 
-If succeeded the first terminal should print out "Trying to login"
+- Run in seperate terminal **_java -Djava.security.policy=client.policy client.Client_**
+
+If succeeded you should be welcomed to the exam center and will be asked to login.
+
+---
+
+####Sample Login Details:
+Student Id: 1 
+
+Password: mypass
