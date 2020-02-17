@@ -136,8 +136,30 @@ public class ExamEngine implements ExamServer {
         Boolean valid = checkSession(studentid,token);
 
         if(valid){
-            availableForCorrection.add(completed);
+            if(availableForCorrection.isEmpty()){
+                availableForCorrection.add(completed);
+            }else {
+                boolean exists = false;
+                AssessmentClass assessment1 = (AssessmentClass) completed;
+                for (Assessment assessment : availableForCorrection) {
+                    AssessmentClass assessment2 = (AssessmentClass) assessment;
+
+                    if (assessment1.getAssociatedID() == assessment2.getAssociatedID() && assessment1.getCourseCode().equals(assessment2.getCourseCode())) {
+                        int index = availableForCorrection.indexOf(assessment);
+                        System.out.println("index: " + index);
+                        System.out.println("Assessment already exists");
+                        availableForCorrection.set(index, completed);
+                        exists = true;
+                    }
+                }
+                if(exists == false) {
+                    System.out.println("Assessment does not exist");
+                    availableForCorrection.add(completed);
+                }
+            }
             System.out.println("Assessment has been submitted for correction");
+            System.out.println("Assessment submitted" + completed);
+            System.out.println("Assessment ready for correction" + availableForCorrection);
         }else{
             System.out.println("Session details are invalid");
             throw new UnauthorizedAccess("No session matches your credentials");
@@ -153,10 +175,18 @@ public class ExamEngine implements ExamServer {
         students.add(declan);
 
         ArrayList<Question > questions = new ArrayList<>();
-        Question question1 = new QuestionClass();
-        questions.add(question1);
-        Question question2 = new QuestionClass();
-        questions.add(question2);
+        String [] o1 = {"1. Liverpool", "2. Manchester City", "3. Chelsea"};
+        String [] o2 = {"1. Oakland Raiders", "2. Dallas Cowboys", "3. Kansas City Chiefs"};
+        String [] o3 = {"1. Miami Heat", "2. Toronto Raptors", "3. Houston Rockets"};
+
+        Question q1 = new QuestionClass(1, "Who won the Premier League in 2019", o1);
+        Question q2 = new QuestionClass(2, "Who won the Superbowl in 2020", o2);
+        Question q3 = new QuestionClass(3, "Who won the NBA Finals in 2019", o3);
+
+        questions.add(q1);
+        questions.add(q2);
+        questions.add(q3);
+
 
         LocalDate closingDate = LocalDate.parse("2020-02-17");
         String title = "CT414";
@@ -184,8 +214,8 @@ public class ExamEngine implements ExamServer {
             ExamServer engine = new ExamEngine();
             ExamServer stub =
                 (ExamServer) UnicastRemoteObject.exportObject(engine, 0);
-            Registry registry = LocateRegistry.createRegistry(20345);
-            //Registry registry = LocateRegistry.getRegistry(20345);
+//            Registry registry = LocateRegistry.createRegistry(20345);
+            Registry registry = LocateRegistry.getRegistry(20345);
             registry.rebind(name, stub);
             System.out.println("ExamEngine bound");
         } catch (Exception e) {

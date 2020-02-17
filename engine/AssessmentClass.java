@@ -12,6 +12,7 @@ import java.util.List;
 public class AssessmentClass implements Assessment {
 
     private ArrayList<Question> questions = new ArrayList<>();
+    private int[] answers;
     private LocalDate closingDate;
     private String information;
     private String courseCode;
@@ -22,6 +23,7 @@ public class AssessmentClass implements Assessment {
         this.studentid = studentid;
         this.questions = questions;
         this.courseCode = title;
+        answers = new int[questions.size()];
         this.information = ("\n Course code: " + title + "\n Closing Date: " + closingDate.toString() + "\n Number of Questions: " + questions.size());
     }
 
@@ -52,14 +54,29 @@ public class AssessmentClass implements Assessment {
 
     @Override
     public void selectAnswer(int questionNumber, int optionNumber) throws InvalidQuestionNumber, InvalidOptionNumber {
-
+        for (Question question: questions) {
+            if(questionNumber == question.getQuestionNumber()) {
+                String[] options = question.getAnswerOptions();
+                if(optionNumber > 0 && optionNumber <= options.length) {
+                    answers[questionNumber - 1] = optionNumber;
+                    return;
+                }else {
+                    throw new InvalidOptionNumber();
+                }
+            }
+        }
+        throw new InvalidQuestionNumber();
     }
 
     @Override
     public int getSelectedAnswer(int questionNumber) {
+        for (Question question: questions) {
+            if(questionNumber == question.getQuestionNumber()) {
+               return answers[questionNumber - 1];
+            }
+        }
         return 0;
     }
-
     @Override
     public int getAssociatedID() {
         return studentid;
@@ -72,6 +89,5 @@ public class AssessmentClass implements Assessment {
     public void setCourseCode(String courseCode) {
         this.courseCode = courseCode;
     }
-
 
 }

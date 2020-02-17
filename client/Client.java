@@ -1,9 +1,11 @@
 package client;
 import assess.Assessment;
 import assess.ExamServer;
+import assess.Question;
 import errors.NoMatchingAssessment;
 import errors.UnauthorizedAccess;
 
+import java.util.List;
 import java.util.Scanner;
 
 import java.rmi.registry.LocateRegistry;
@@ -13,10 +15,10 @@ public class Client {
     private Client() {}
 
     public static void getCommands(){
-        System.out.println("\n You are Logged in");
         System.out.println("\n ---- Available commands ---- ");
         System.out.println("To get all available Assessments =  all ");
         System.out.println("To download an Assessment =  get ");
+        System.out.println("To edit an Assessment =  edit ");
         System.out.println("To submit an Assessment =  submit ");
         System.out.println("To print out commands =  help ");
         System.out.println("To end the session =  end ");
@@ -64,6 +66,7 @@ public class Client {
             }
 
             if(authToken != 0){
+                System.out.println("\n You are Logged in");
                 getCommands();
             }
 
@@ -86,17 +89,78 @@ public class Client {
 
                         assessment = stub.getAssessment(authToken, studentId, courseCode);
                         System.out.print("\n Assessment Downloaded! \n");
+                        }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
+                }else if(command.equals("edit")){
+                    System.out.print("\n You are now in edit mode ");
+                    System.out.print("\n ---- Edit mode Commands ---- ");
+                    System.out.print("\n View list of all questions and answers options =  view ");
+                    System.out.print("\n Return one question only with answer options =  viewone ");
+                    System.out.print("\n To select an answer =  select ");
+                    System.out.print("\n To view a selected answer =  check ");
+                    System.out.print("\n To exit edit mode =  exit ");
+                    System.out.print("\n ---------------------- ");
 
-                    }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
+                    while(true){
+
+                        System.out.print("\n Please input a command to edit assessment: ");
+                        String editCommand = scanner.next();
+                        List<Question> questions = assessment.getQuestions();
+                        System.out.print("\n" + assessment.getInformation());
+
+                        if(editCommand.equals("view")){
+
+                        for (Question question: questions) {
+                            System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                            System.out.print("\n The Options are: " + question.toString());
+                        }
+
+                        }else if(editCommand.equals("viewone")){
+                            System.out.print("\n\n Please select a question number: ");
+                            int response = scanner.nextInt();
+                            for (Question question: questions) {
+                                if(response == question.getQuestionNumber()) {
+                                    System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                                    System.out.print("\n The Options are: " + question.toString());
+                                }
+                            }
+
+                        }else if(editCommand.equals("select")){
+                            System.out.print("\n\n What question do you want to answer? ");
+                            int q = scanner.nextInt();
+                            for (Question question: questions) {
+                                if(q == question.getQuestionNumber()) {
+                                    System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                                    System.out.print("\n The Options are: " + question.toString());
+                                    System.out.print("\n Select an option: ");
+                                    int o = scanner.nextInt();
+                                    assessment.selectAnswer(question.getQuestionNumber() , o);
+                                }
+                            }
 
 
-                    // need to interact with assessment object
-                    // implement remaining methods
-                    // view question and options
-                    // answer a question
-                    // change a question
+                        }else if(editCommand.equals("check")){
+
+                            System.out.print("\n\n What answer do you want to check? ");
+                            int response = scanner.nextInt();
+                            for (Question question: questions) {
+                                if(response == question.getQuestionNumber()) {
+                                    System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                                    System.out.print("\n The Options are: " + question.toString());
+                                    System.out.print("\n You Selected option: " + assessment.getSelectedAnswer(response));
+                                }
+                            }
+
+                        }else if(editCommand.equals("exit")) {
+
+                            System.out.println("\n Finished editing");
+                            break;
+
+                        }else{
+                            System.out.println("\n Invalid Command!");
+                        }
 
 
+                    }
 
                 }else if(command.equals("submit")) {
 
