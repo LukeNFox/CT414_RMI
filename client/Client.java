@@ -2,6 +2,8 @@ package client;
 import assess.Assessment;
 import assess.ExamServer;
 import assess.Question;
+import errors.InvalidOptionNumber;
+import errors.InvalidQuestionNumber;
 import errors.NoMatchingAssessment;
 import errors.UnauthorizedAccess;
 
@@ -101,6 +103,7 @@ public class Client {
                     }
 
                 }else if(command.equals("edit")){
+
                     System.out.print("\n You are now in edit mode ");
                     System.out.print("\n ---- Edit mode Commands ---- ");
                     System.out.print("\n View list of all questions and answers options =  view ");
@@ -111,10 +114,16 @@ public class Client {
                     System.out.print("\n ---------------------- ");
 
                     while(true){
+                        if(assessment == null){
+                            System.out.print("\n\n Exiting edit mode as you have not downloaded an Assignment yet! \n\n");
+                            break;
+                        }
 
                         System.out.print("\n Please input a command to edit assessment: ");
                         String editCommand = scanner.next();
+
                         List<Question> questions = assessment.getQuestions();
+
                         System.out.print("\n" + assessment.getInformation());
 
                         if(editCommand.equals("view")){
@@ -143,7 +152,13 @@ public class Client {
                                     System.out.print("\n The Options are: " + question.toString());
                                     System.out.print("\n Select an option: ");
                                     int o = scanner.nextInt();
-                                    assessment.selectAnswer(question.getQuestionNumber() , o);
+                                    try {
+                                        assessment.selectAnswer(question.getQuestionNumber(), o);
+                                    }catch(InvalidOptionNumber e){
+                                        System.out.println("Error: " + e.getMessage());
+                                    }catch(InvalidQuestionNumber e){
+                                        System.out.println("Error: " + e.getMessage());
+                                    }
                                 }
                             }
 
@@ -157,6 +172,7 @@ public class Client {
                                     System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
                                     System.out.print("\n The Options are: " + question.toString());
                                     System.out.print("\n You Selected option: " + assessment.getSelectedAnswer(response));
+
                                 }
                             }
 

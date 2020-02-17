@@ -24,7 +24,7 @@ public class AssessmentClass implements Assessment {
         this.questions = questions;
         this.courseCode = title;
         answers = new int[questions.size()];
-        this.information = ("\n Course code: " + title + "\n Closing Date: " + closingDate.toString() + "\n Number of Questions: " + questions.size());
+        this.information = ("\n ----- Course code: " + title + "\n Closing Date: " + closingDate.toString() + "\n Number of Questions: " + questions.size());
     }
 
     @Override
