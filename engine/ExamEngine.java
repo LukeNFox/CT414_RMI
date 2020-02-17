@@ -1,6 +1,7 @@
 package engine;
 
 import assess.*;
+import client.AssessmentClass;
 import client.QuestionClass;
 import errors.*;
 
@@ -157,10 +158,17 @@ public class ExamEngine implements ExamServer {
         students.add(declan);
 
         ArrayList<Question > questions = new ArrayList<>();
-        Question question1 = new QuestionClass();
-        questions.add(question1);
-        Question question2 = new QuestionClass();
-        questions.add(question2);
+        String [] o1 = {"Liverpool", "Manchester City", "Chelsea"};
+    	String [] o2 = {"Oakland Raiders", "Dallas Cowboys", "Kansas City Chiefs"};
+    	String [] o3 = {"Miami Heat", "Toronto Raptors", "Houston Rockets"};
+
+    	Question q1 = new QuestionClass(1, "Who won the Premier League in 2019", o1);
+    	Question q2 = new QuestionClass(2, "Who won the Superbowl in 2020", o2);
+    	Question q3 = new QuestionClass(3, "Who won the NBA Finals in 2019", o3);
+        
+    	questions.add(q1);
+    	questions.add(q2);
+    	questions.add(q3);
 
 
         LocalDate closingDate = LocalDate.parse("2020-02-17");
