@@ -110,14 +110,23 @@ public class ExamEngine implements ExamServer {
         // return assessment object
         // ensure assessment available to student
         Boolean valid = false;
+        Boolean assessmentClosed = true;
+
         valid = checkSession(studentid, token);
 
         System.out.println("Finding assessment matching course code");
         if(valid) {
             for (Assessment assessment : assessments) {
                 AssessmentClass assessment1 = (AssessmentClass) assessment;
-                if (assessment1.getAssociatedID() == studentid && assessment1.getCourseCode().equals(courseCode))
+                if (assessment1.getAssociatedID() == studentid && assessment1.getCourseCode().equals(courseCode)) {
+                    assessmentClosed = checkClosingDate(assessment);
+                    if(!assessmentClosed){
                     return assessment;
+                    }else{
+                        System.out.println("Assessment is closed");
+                        throw new UnauthorizedAccess("Assessment is closed");
+                    }
+                }
             }
             System.out.println("No assessments match course code");
             throw new NoMatchingAssessment("Could not find matching assessment");
@@ -137,6 +146,7 @@ public class ExamEngine implements ExamServer {
         // check submission date has not passed
         // add assessment to list of assessments ready for correction
         Boolean valid = false;
+        Boolean assessmentClosed = true;
 
         valid = checkSession(studentid, token);
 
@@ -146,20 +156,26 @@ public class ExamEngine implements ExamServer {
             }else {
                 boolean exists = false;
                 AssessmentClass assessment1 = (AssessmentClass) completed;
-                for (Assessment assessment : availableForCorrection) {
-                    AssessmentClass assessment2 = (AssessmentClass) assessment;
+                assessmentClosed = checkClosingDate(assessment1);
+                if(!assessmentClosed){
+                    for (Assessment assessment : availableForCorrection) {
+                        AssessmentClass assessment2 = (AssessmentClass) assessment;
 
-                    if (assessment1.getAssociatedID() == assessment2.getAssociatedID() && assessment1.getCourseCode().equals(assessment2.getCourseCode())) {
-                        int index = availableForCorrection.indexOf(assessment);
-                        System.out.println("index: " + index);
-                        System.out.println("Assessment already exists");
-                        availableForCorrection.set(index, completed);
-                        exists = true;
+                        if (assessment1.getAssociatedID() == assessment2.getAssociatedID() && assessment1.getCourseCode().equals(assessment2.getCourseCode())) {
+                            int index = availableForCorrection.indexOf(assessment);
+                            System.out.println("index: " + index);
+                            System.out.println("Assessment already exists");
+                            availableForCorrection.set(index, completed);
+                            exists = true;
+                        }
                     }
-                }
-                if(exists == false) {
-                    System.out.println("Assessment does not exist");
-                    availableForCorrection.add(completed);
+                    if(exists == false) {
+                        System.out.println("Assessment does not exist");
+                        availableForCorrection.add(completed);
+                    }
+                }else{
+                    System.out.println("Assessment is closed");
+                    throw new UnauthorizedAccess("Assessment is closed");
                 }
             }
             System.out.println("Assessment has been submitted for correction");
@@ -195,6 +211,12 @@ public class ExamEngine implements ExamServer {
         for(Student student: students) {
             assessments.add(new AssessmentClass(closingDate, title, student.getStudentid(), questions));
         }
+
+        LocalDate expiredClosingDate = LocalDate.parse("2020-01-17");
+        String exiredTitle = "CT413";
+        for(Student student: students) {
+            assessments.add(new AssessmentClass(expiredClosingDate, exiredTitle, student.getStudentid(), questions));
+        }
     }
 
     public boolean checkSession(int studentid, int token) throws UnauthorizedAccess{
@@ -218,6 +240,14 @@ public class ExamEngine implements ExamServer {
         }else{
             return true;
         }
+    }
+
+    public boolean checkClosingDate(Assessment assessment){
+        LocalDate closingDate = assessment.getClosingDate();
+        if(closingDate.isAfter(LocalDate.now()) || closingDate.isEqual(LocalDate.now())){
+            return false;
+        }
+        return true;
     }
 
     public static void main(String[] args) {
