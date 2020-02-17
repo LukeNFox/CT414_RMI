@@ -77,8 +77,12 @@ public class Client {
                 String command = scanner.next();
 
                 if(command.equals("all")){
-
-                    System.out.println("\n" + stub.getAvailableSummary(authToken,studentId) + "\n");
+                    try {
+                        System.out.println("\n" + stub.getAvailableSummary(authToken,studentId) + "\n");
+                    }catch (UnauthorizedAccess e){
+                        System.out.print("\n Unable to get Assessments, please Logout!");
+                        System.out.print("\n Error: " + e.getMessage());
+                    }
 
                 }else if(command.equals("get")) {
 
@@ -89,7 +93,13 @@ public class Client {
 
                         assessment = stub.getAssessment(authToken, studentId, courseCode);
                         System.out.print("\n Assessment Downloaded! \n");
-                        }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
+
+                        }catch(NoMatchingAssessment e){System.out.print("\n" + e);
+                        }catch (UnauthorizedAccess e){
+                        System.out.print("\n Unable to get Assessment, please Logout!");
+                        System.out.print("\n Error: " + e.getMessage());
+                    }
+
                 }else if(command.equals("edit")){
                     System.out.print("\n You are now in edit mode ");
                     System.out.print("\n ---- Edit mode Commands ---- ");
@@ -171,9 +181,13 @@ public class Client {
 
                         if(assessment != null) {
 
-                            stub.submitAssessment(authToken, studentId, assessment);
-                            System.out.print("\n Assessment Submitted! \n");
-
+                            try {
+                                stub.submitAssessment(authToken, studentId, assessment);
+                                System.out.print("\n Assessment Submitted! \n");
+                            }catch (UnauthorizedAccess e){
+                                System.out.print("\n Unable to submit Assessment, please Logout!");
+                                System.out.print("\n Error: " + e.getMessage());
+                            }
                         }else{
                             System.out.print("\n You have not completed an assessment yet\n ");
                         }

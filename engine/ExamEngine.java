@@ -9,6 +9,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 public class ExamEngine implements ExamServer {
@@ -57,6 +58,8 @@ public class ExamEngine implements ExamServer {
             if(existingSession){
                 System.out.println("Session already Exists");
                 token = thisSession.getToken();
+                SessionClass s = (SessionClass) thisSession;
+                s.setExpiry();
             }else{
                 System.out.println("Creating Session");
                 thisSession = new SessionClass(studentid);
@@ -78,7 +81,9 @@ public class ExamEngine implements ExamServer {
         // check token is valid
         // return list of assessment information available for that student
 
-        Boolean valid = checkSession(studentid, token);
+        Boolean valid = false;
+        valid = checkSession(studentid, token);
+
         List<String> summaries = new ArrayList<>();
 
         System.out.println("Gathering assessment details");
@@ -104,8 +109,8 @@ public class ExamEngine implements ExamServer {
         // check token is valid
         // return assessment object
         // ensure assessment available to student
-
-        Boolean valid = checkSession(studentid, token);
+        Boolean valid = false;
+        valid = checkSession(studentid, token);
 
         System.out.println("Finding assessment matching course code");
         if(valid) {
@@ -131,9 +136,9 @@ public class ExamEngine implements ExamServer {
         // check token is valid
         // check submission date has not passed
         // add assessment to list of assessments ready for correction
+        Boolean valid = false;
 
-
-        Boolean valid = checkSession(studentid,token);
+        valid = checkSession(studentid, token);
 
         if(valid){
             if(availableForCorrection.isEmpty()){
@@ -160,9 +165,6 @@ public class ExamEngine implements ExamServer {
             System.out.println("Assessment has been submitted for correction");
             System.out.println("Assessment submitted" + completed);
             System.out.println("Assessment ready for correction" + availableForCorrection);
-        }else{
-            System.out.println("Session details are invalid");
-            throw new UnauthorizedAccess("No session matches your credentials");
         }
 
     }
@@ -196,13 +198,26 @@ public class ExamEngine implements ExamServer {
     }
 
     public boolean checkSession(int studentid, int token) throws UnauthorizedAccess{
+        boolean valid = false;
+        boolean expired = true;
+
         for(Session session: sessions){
+            SessionClass session1 = (SessionClass) session;
             if(session.getStudentid() == studentid && session.getToken() == token){
                 System.out.println("Session details are valid for this request");
-                return true;
+                valid = true;
+                if(session1.getExpiry().isAfter(LocalTime.now())){
+                    expired = false;
+                }
             }
         }
-        throw new UnauthorizedAccess("No session matches your credentials");
+        if (valid != true) {
+            throw new UnauthorizedAccess("No session matches your credentials");
+        } else if(expired == true){
+            throw new UnauthorizedAccess("Session has expired");
+        }else{
+            return true;
+        }
     }
 
     public static void main(String[] args) {
