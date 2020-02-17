@@ -57,6 +57,7 @@ public class AssessmentClass implements Assessment {
     public void selectAnswer(int questionNumber, int optionNumber) throws InvalidQuestionNumber, InvalidOptionNumber {
     	for (Question question: questions) {
     		if(questionNumber == question.getQuestionNumber()) {
+    			question.getAnswerOptions();
     			answers.add(optionNumber);
     		}
     	}

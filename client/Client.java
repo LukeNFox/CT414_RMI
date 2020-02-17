@@ -89,28 +89,29 @@ public class Client {
                     try {
                         assessment = stub.getAssessment(authToken, studentId, courseCode);
                         System.out.print("\n Assessment Downloaded! \n");
-                        
-                        if(courseCode.equals("CT414")){
-                            
-                        	System.out.print("\n" + assessment.getInformation());
-                        	
-                        	for (int i=0; i==question.getQuestionNumber(); i++) {
-                        		
-                        		System.out.print("\n Question " + i + ": " + assessment.getQuestion(i));
-                        		System.out.print("\n Your Options are: " + question.getAnswerOptions());
-                        		System.out.print("\n Is the answer 0, 1 or 2? ");
-                        		
-                        		int response = scanner.nextInt();
-                        		assessment.selectAnswer(question.getQuestionNumber(), response);
-                        		
-                        } 
-                       }
+                         
                         
                     }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
 
 
                     // need to interact with assessment object
                     // for example complete questions
+                    
+                    if(courseCode.equals("CT414")){
+                        
+                    	System.out.print("\n" + assessment.getInformation());
+                    	
+                    	for (int i=1; i <= 3; i++) {
+                    		
+                    		System.out.print("\n Question " + i + ": " + assessment.getQuestion(i));
+                    		System.out.print("\n Your Options are: " + question.getAnswerOptions());
+                      		System.out.print("\n Is the answer 0, 1 or 2? ");
+                    		
+                    		int response = scanner.nextInt();
+                    		assessment.selectAnswer(question.getQuestionNumber(), response);
+                    		
+                    } 
+                   }
                     
 
                 }else if(command.equals("submit")) {

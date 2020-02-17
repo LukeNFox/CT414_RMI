@@ -8,7 +8,7 @@ public class QuestionClass implements Question {
 	private String qDetail;
 	private String[] options;
 	
-    public QuestionClass(int qNumber, String qDetail, String[] options){
+    public QuestionClass(int qNumber, String qDetail, String[] options ){
     	this.qNumber = qNumber;
     	this.qDetail = qDetail;
     	this.options = options;

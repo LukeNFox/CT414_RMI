@@ -170,7 +170,6 @@ public class ExamEngine implements ExamServer {
     	questions.add(q2);
     	questions.add(q3);
 
-
         LocalDate closingDate = LocalDate.parse("2020-02-17");
         String title = "CT414";
         for(Student student: students) {
