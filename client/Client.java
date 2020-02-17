@@ -5,21 +5,20 @@ import assess.Question;
 import errors.NoMatchingAssessment;
 import errors.UnauthorizedAccess;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.time.LocalDate;
 
 public class Client {
     private Client() {}
 
     public static void getCommands(){
-        System.out.println("\n You are Logged in");
         System.out.println("\n ---- Available commands ---- ");
         System.out.println("To get all available Assessments =  all ");
         System.out.println("To download an Assessment =  get ");
+        System.out.println("To edit an Assessment =  edit ");
         System.out.println("To submit an Assessment =  submit ");
         System.out.println("To print out commands =  help ");
         System.out.println("To end the session =  end ");
@@ -67,61 +66,114 @@ public class Client {
             }
 
             if(authToken != 0){
+                System.out.println("\n You are Logged in");
                 getCommands();
             }
 
             Assessment assessment = null;
-            Question question= null;
 
             while(authToken != 0){
                 System.out.print("\n Please input a command: ");
                 String command = scanner.next();
 
                 if(command.equals("all")){
+
                     System.out.println("\n" + stub.getAvailableSummary(authToken,studentId) + "\n");
+
                 }else if(command.equals("get")) {
-
-
 
                     System.out.print("\n Please enter Course Code: ");
                     String courseCode = scanner.next();
                     System.out.print("\n Downloading Assessment..... ");
                     try {
+
                         assessment = stub.getAssessment(authToken, studentId, courseCode);
                         System.out.print("\n Assessment Downloaded! \n");
-                         
-                        
-                    }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
+                        }catch(NoMatchingAssessment e){System.out.print("\n" + e);}
+                }else if(command.equals("edit")){
+                    System.out.print("\n You are now in edit mode ");
+                    System.out.print("\n ---- Edit mode Commands ---- ");
+                    System.out.print("\n View list of all questions and answers options =  view ");
+                    System.out.print("\n Return one question only with answer options =  viewone ");
+                    System.out.print("\n To select an answer =  select ");
+                    System.out.print("\n To view a selected answer =  check ");
+                    System.out.print("\n To exit edit mode =  exit ");
+                    System.out.print("\n ---------------------- ");
+
+                    while(true){
+
+                        System.out.print("\n Please input a command to edit assessment: ");
+                        String editCommand = scanner.next();
+                        List<Question> questions = assessment.getQuestions();
+                        System.out.print("\n" + assessment.getInformation());
+
+                        if(editCommand.equals("view")){
+
+                        for (Question question: questions) {
+                            System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                            System.out.print("\n The Options are: " + question.toString());
+                        }
+
+                        }else if(editCommand.equals("viewone")){
+                            System.out.print("\n\n Please select a question number: ");
+                            int response = scanner.nextInt();
+                            for (Question question: questions) {
+                                if(response == question.getQuestionNumber()) {
+                                    System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                                    System.out.print("\n The Options are: " + question.toString());
+                                }
+                            }
+
+                        }else if(editCommand.equals("select")){
+                            System.out.print("\n\n What question do you want to answer? ");
+                            int q = scanner.nextInt();
+                            for (Question question: questions) {
+                                if(q == question.getQuestionNumber()) {
+                                    System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                                    System.out.print("\n The Options are: " + question.toString());
+                                    System.out.print("\n Select an option: ");
+                                    int o = scanner.nextInt();
+                                    assessment.selectAnswer(question.getQuestionNumber() , o);
+                                }
+                            }
 
 
-                    // need to interact with assessment object
-                    // for example complete questions
-                    
-                    if(courseCode.equals("CT414")){
-                        
-                    	System.out.print("\n" + assessment.getInformation());
-                    	
-                    	for (int i=1; i <= 3; i++) {
-                    		
-                    		System.out.print("\n Question " + i + ": " + assessment.getQuestion(i));
-                    		System.out.print("\n Your Options are: " + question.getAnswerOptions());
-                      		System.out.print("\n Is the answer 0, 1 or 2? ");
-                    		
-                    		int response = scanner.nextInt();
-                    		assessment.selectAnswer(question.getQuestionNumber(), response);
-                    		
-                    } 
-                   }
-                    
+                        }else if(editCommand.equals("check")){
+
+                            System.out.print("\n\n What answer do you want to check? ");
+                            int response = scanner.nextInt();
+                            for (Question question: questions) {
+                                if(response == question.getQuestionNumber()) {
+                                    System.out.print("\n Question " + question.getQuestionNumber() + ": " + question.getQuestionDetail());
+                                    System.out.print("\n The Options are: " + question.toString());
+                                    System.out.print("\n You Selected option: " + assessment.getSelectedAnswer(response));
+                                }
+                            }
+
+                        }else if(editCommand.equals("exit")) {
+
+                            System.out.println("\n Finished editing");
+                            break;
+
+                        }else{
+                            System.out.println("\n Invalid Command!");
+                        }
+
+
+                    }
 
                 }else if(command.equals("submit")) {
+
                     System.out.print("\n Are you sure you want to submit your assessment(Y/N)? ");
                     String response = scanner.next();
 
                     if(response.equals("Y")){
+
                         if(assessment != null) {
+
                             stub.submitAssessment(authToken, studentId, assessment);
                             System.out.print("\n Assessment Submitted! \n");
+
                         }else{
                             System.out.print("\n You have not completed an assessment yet\n ");
                         }
@@ -134,16 +186,19 @@ public class Client {
 
 
                 }else if(command.equals("help")) {
+
                     getCommands();
+
                 } else if(command.equals("end")) {
+
                     System.out.println("\n Goodbye");
                     break;
+
                 }else{
                     System.out.println("\n Invalid Command!");
                 }
             }
 
-            // System.out.println("Remote method invoked");
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
